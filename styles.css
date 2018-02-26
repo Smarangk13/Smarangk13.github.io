@@ -1,0 +1,23 @@
+.container {
+    position: relative;
+}
+
+.center {
+    position: absolute;
+    left: 0;
+    top: 20%;
+    width: 100%;
+    text-align: center;
+    font-size: 18px;
+}
+
+img {
+    width: 100%;
+    height: auto;
+    opacity: 0.3;
+}
+canvas {
+  border: 1px solid black;
+  width: 700px;
+  height: 400px;
+}

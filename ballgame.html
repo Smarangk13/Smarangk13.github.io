@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+</head>
+<title> Game </title>
+<link rel="stylesheet" href="./styles.css">
+<script src="./gamelogic.js"></script>
+<script src="./gametexts.js"></script>
+<script src="./player.js"></script>
+<script src="./balllogic.js"></script>
+<script src="./enemylogic.js"></script>
+<script src="./inputs.js"></script>
+</head>
+
+<body>
+  <div class="container">
+    <img src="assets\bg1.jpg" alt="BG" width="1000">
+    <div class="center">
+      <canvas id="myCanvas"></canvas>
+    </div>
+  </div>
+  <audio id="bounceSound">
+    <source src="./assets/sounds/Tap.m4a">
+  </audio>
+  <audio id="throwSound">
+    <source src="./assets/sounds/whoo.m4a">
+  </audio>
+  <audio id="hitSound">
+    <source src="./assets/sounds/beep.m4a">
+  </audio>
+  <audio id="getHitSound">
+    <source src="./assets/sounds/buzz.m4a">
+  </audio>
+</body>
+
+</html>
