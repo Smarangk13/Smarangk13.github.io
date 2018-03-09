@@ -26,6 +26,13 @@ var instructionBox = {
   y2 : 150
 };
 
+var instructiontextBox = {
+  x1 : 130,
+  x2 : 300,
+  y1 : 0,
+  y2 : 150
+};
+
 var playAgainBox = {
   x1 : 70,
   x2 : 220,
@@ -57,13 +64,15 @@ function drawImage(box,image) {
 }
 
 function welcomeScreen() {
-  var startVal, mx, my;
+  var startVal, mx, my,instructionsOpen;
   var startButton = new Image();
   startButton.src = "./assets/startButton.png";
   var instructionButton = new Image();
   instructionButton.src = "./assets/instructions.png";
   var startBackground = new Image();
   startBackground.src = "./assets/startBackground.png";
+  var instructionsText = new Image();
+  instructionsText.src = "./assets/instructionsBox.png";
   // You win
   //img=
   ctx.save();
@@ -84,9 +93,15 @@ function welcomeScreen() {
     mx = inputStates.mousePos.x;
     my = inputStates.mousePos.y;
     startVal = mouseinbox(startBox, mx, my);
+    instructionsOpen = mouseinbox(instructionBox, mx, my);
     if (startVal) {
       if (inputStates.clicked) {
         gameState = 10;
+      }
+    }
+    if (instructionsOpen) {
+      if (inputStates.clicked) {
+        drawImage(instructiontextBox,instructionsText)
       }
     }
   }
