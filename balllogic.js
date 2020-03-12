@@ -2,7 +2,8 @@ function createBalls(numberOfBalls) {
   for (var i = 0; i < numberOfBalls; i++) {
 
     // Create a ball with random position and speed angle of movement
-    // Use fixed size and have a toggle if ball is slected.
+    // Use fixed size and have a toggle if ball is slected
+    // function Ball(x, y, angle, v, diameter, state)
     var ball = new Ball(width * Math.random(),
       height * Math.random(),
       (2 * Math.PI) * Math.random(),
@@ -60,6 +61,55 @@ function testCollisionWithCharacters(ball, character) {
   }
 }
 
+function testCollisionWithObstacles(ball) {
+  var bounceOccured = 0;
+
+  //treat ball like box for easy collision detection
+  var ballRight = ball.x + ball.radius;
+  var ballTop = ball.y - ball.radius;
+  ballDiameter = ball.radius * 2;
+  ballRect = [ballRight, ballTop, ballDiameter, ballDiameter]
+
+  for (var i = 0; i < obstacles.length; i++) {
+    wallx = obstacles[i];
+    collides = rectangleCollision(ballRect,wallx);
+
+    // Collision handling
+    if (collides > 0) {
+      bounceOccured = 1;
+
+      // left
+      if (collides == 1) {
+        ball.angle = -ball.angle + Math.PI;
+        ball.x = wallx[0] - ballDiameter;
+      }
+      // Right
+      else if (collides == 2) {
+        ball.angle = -ball.angle + Math.PI;
+        ball.x = wallx[0] + wallx[2] + ballDiameter;
+      }
+      // Top
+      else if (collides == 3) {
+        ball.angle = -ball.angle
+        ball.y = wallx[1] - ballDiameter;
+      }
+      // Bottom
+      else if (collides == 4) {
+        ball.angle = -ball.angle;
+        ball.y = wallx[1] + wallx[3] + ballDiameter;
+      }
+    }
+
+    // If ball inside wall place it outside
+    else if (collides < 0) {
+      ball.x = wallx[0] - ballDiameter;
+      ball.y = wallx[1] - ballDiameter;
+    }
+  }
+
+  return bounceOccured;
+}
+
 // constructor function for balls
 // Ball states
 /*
@@ -80,7 +130,7 @@ function Ball(x, y, angle, v, diameter, state) {
   this.draw = function() {
     // Create gradient
     var r = this.radius;
-    var r34 = 3 * r / 4
+    // var r34 = 3 * r / 4
     var grd = ctx.createRadialGradient(this.x, this.y, r / 8, this.x, this.y, r);
     if (this.v < 0.5 && this.v > -0.5) {
       if (this.state === 2 || this.state === 3) {
@@ -124,34 +174,36 @@ function Ball(x, y, angle, v, diameter, state) {
 }
 
 function moveWith2(character) {
-  var ballNum=-1;
-  var heldBall=0;
+  var ballNum = -1;
+  var heldBall = 0;
   // console.log(character.speedX);
-  for (var j=0;j<character.ballsHeld.length;j++){
-    ballNum=character.ballsHeld[j];
-    heldBall=ballArray[ballNum]
+  for (var j = 0; j < character.ballsHeld.length; j++) {
+    ballNum = character.ballsHeld[j];
+    heldBall = ballArray[ballNum]
     //too far
-    if ((Math.abs(heldBall.x-character.x)+Math.abs(heldBall.y-character.y))>25) {
-      character.ballsHeld[j]=0;
+    if ((Math.abs(heldBall.x - character.x) + Math.abs(heldBall.y - character.y)) > 25) {
+      character.ballsHeld[j] = 0;
       midpop(character.ballsHeld);
-      heldBall.state=0;
-    }else {
-    heldBall.x +=character.speedX;
-    heldBall.y +=character.speedY;
-  }
+      heldBall.state = 0;
+    } else {
+      // heldBall.x += character.x;
+      // heldBall.y += character.y;
+      heldBall.x += character.speedX;
+      heldBall.y += character.speedY;
+    }
   }
 }
 
-function midpop(list){
-  var flag=0;
-  for (var j=0;j<list.length;j++){
-    if (list[j]===0) {
-      flag=1;
+function midpop(list) {
+  var flag = 0;
+  for (var j = 0; j < list.length; j++) {
+    if (list[j] === 0) {
+      flag = 1;
     }
-    if (flag===1) {
-      if (j+1<list.length) {
-        list[j]=list[j+1]
-      }else {
+    if (flag === 1) {
+      if (j + 1 < list.length) {
+        list[j] = list[j + 1]
+      } else {
         list.pop();
       }
     }
@@ -159,8 +211,10 @@ function midpop(list){
 }
 
 function moveWith(ball, character) {
-  ball.x += character.speedX;
-  ball.y += character.speedY;
+  // ball.x += character.speedX;
+  // ball.y += character.speedY;
+  ball.x = character.x;
+  ball.y = character.y;
 }
 
 function throwBall(character) {
@@ -169,7 +223,7 @@ function throwBall(character) {
   // var my=inputStates.mousePos.y;
   for (var j = 0; j < ballArray.length; j++) {
     var ball = ballArray[j];
-    if ((character.ballsHeld[character.ballsHeld.length-1]===j)&&ball.state === 1) {
+    if ((character.ballsHeld[character.ballsHeld.length - 1] === j) && ball.state === 1) {
       character.ballsHeld.pop();
       ball.state = 2;
       xdiff = inputStates.mousePos.x - ball.x;
@@ -184,26 +238,26 @@ function throwBall(character) {
         ball.angle = 2 * Math.PI - ball.angle;
       }
       ball.thrownBy = 0;
-      ball.v = 15;
+      ball.v = 10;
       break;
     }
   }
 }
 
-function throwBallAi(character,enemyNum,opponentNum) {
+function throwBallAi(character, enemyNum, opponentNum) {
   var xdiff, ydiff, dist;
-  var mx,my;
+  var mx, my;
 
-  if(enemyNum===-1){
-    mx=player.x;
-    my=player.y;
-  }else {
-    mx=opponentArray[enemyNum].x;
-    my=opponentArray[enemyNum].y;
+  if (enemyNum === -1) {
+    mx = player.x;
+    my = player.y;
+  } else {
+    mx = opponentArray[enemyNum].x;
+    my = opponentArray[enemyNum].y;
   }
   for (var j = 0; j < ballArray.length; j++) {
     var ball = ballArray[j];
-    if ((character.ballsHeld[character.ballsHeld.length-1]===j)&&ball.state === 1) {
+    if ((character.ballsHeld[character.ballsHeld.length - 1] === j) && ball.state === 1) {
       character.ballsHeld.pop();
       ball.state = 2;
       xdiff = mx - ball.x;
@@ -218,40 +272,41 @@ function throwBallAi(character,enemyNum,opponentNum) {
       } else if (xdiff > 0 && ydiff < 0) {
         ball.angle = 2 * Math.PI - ball.angle;
       }
-      ball.v = 15;
-      ball.thrownBy = opponentNum+1;
+      ball.v = 6;
+      ball.thrownBy = opponentNum + 1;
       break;
     }
   }
 }
 
-function collisionReaction(character,ball,ballNum){
+function collisionReaction(character, ball, ballNum) {
   var damage = 0;
-  if (testCollisionWithCharacters(ball,character)){
-    if (ball.state===0) {
-      ball.state=1;
+  if (testCollisionWithCharacters(ball, character)) {
+    if (ball.state === 0) {
+      ball.state = 1;
       character.ballsHeld.push(ballNum);
       character.stance = 2;
-    }else if (ball.state===2) {
+    } else if (ball.state === 2) {
       //console.log("Game over");
-      if (character===opponentArray[ball.thrownBy-1]) {
+      if (character === opponentArray[ball.thrownBy - 1]) {
         //self throw
-      }else if(ball.thrownBy===0){
+      } else if (ball.thrownBy === 0) {
         player.score += 10;
-        character.score -= 5;
-        ball.thrownBy =-1;
-        damage = 1;
-      }else if (ball.thrownBy>0) {
-        opponentArray[ball.thrownBy-1].score +=10;
         character.score -= 5;
         ball.thrownBy = -1;
         damage = 1;
-      }else {
+      } else if (ball.thrownBy > 0) {
+        opponentArray[ball.thrownBy - 1].score += 10;
+        character.score -= 5;
+        ball.thrownBy = -1;
+        damage = 1;
+      } else {
         //score already counted
+        moveWith(ball,character)
       }
     }
   }
-  if(ball.state===1){
+  if (ball.state === 1) {
     //drag ball
     //moveWith(ball,character);
   }

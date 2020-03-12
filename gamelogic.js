@@ -1,6 +1,6 @@
 var canvas, ctx, width, height;
 var totalBalls = 5;
-var totalOpponents = 1;
+var totalOpponents = 3;
 // Game State
 /* States
 0 - Start Screen
@@ -38,6 +38,17 @@ var getHitSound;
 //Array of enemies
 var opponentArray = [];
 var collisionConstant = 5;
+
+// ObstacleMap
+var obstacles = [
+  [60,30,30,80],
+  [220,30,30,80],
+  [120,60,70,20]
+];
+// var obstacles = [
+//   [120,60,70,20]
+// ];
+
 // Inits
 window.onload = function init() {
   // Canvas, context etc.
@@ -101,6 +112,15 @@ function clearCanvas() {
   ctx.clearRect(0, 0, width, height);
 }
 
+function drawObstacles(){
+  ctx.fillStyle = 'black';
+  for (var i = 0; i < obstacles.length; i++){
+    wallx = obstacles[i];
+    ctx.fillRect(wallx[0],wallx[1],wallx[2],wallx[3])
+  }
+  // ctx.restore();
+}
+
 function newGame() {
   player.score = 0;
   opponentArray = [];
@@ -110,6 +130,7 @@ function newGame() {
   gameState = 10;
 }
 
+// Function that is controls most functions in the game
 function gamePlay() {
   // Check if the game is Over
   // if(player.score>50){
@@ -123,21 +144,28 @@ function gamePlay() {
   // draw the player
   drawMyplayer(player.x, player.y);
 
+  // Draw obstacles
+  drawObstacles();
+
   // Check inputs and move the player
   updateplayerPosition();
   moveWith2(player)
   testCharacterWallCollision(player);
   testCharacterOpponentCollision(player);
+  testCharacterObstacleCollision(player);
 
   if (player.score >= scoreToWin) {
     gameState = 3;
     winner = -1;
   }
 
+  //Checks movements of opponents
   for (var i = 0; i < opponentArray.length; i++) {
     var opponent = opponentArray[i];
     testCharacterWallCollision(opponent);
     testCharacterOpponentCollision(opponent);
+    testCharacterObstacleCollision(opponent);
+    // moveWith2(opponent);
     // if(opponent.score>50){
     //   requestAnimationFrame(gameOverLose);
     // }
@@ -161,6 +189,9 @@ function gamePlay() {
     }
     if(collisionReaction(player, ball, i)){
       getHitSound.play();
+    }
+    if(testCollisionWithObstacles(ball)){
+      bounceSound.play();
     }
 
     for (var k = 0; k < opponentArray.length; k++) {

@@ -128,7 +128,7 @@ function displayScore() {
       ctx.fillText("Purple : " + opponentArray[i].score, scorePositionx, (i + 3) * scorePositiony);
     } else if (opponentArray[i].team === 0) {
       ctx.fillStyle = "green;";
-      ctx.fillText("Gren: " + opponentArray[i].score, scorePositionx, (i + 3) * scorePositiony);
+      ctx.fillText("Green: " + opponentArray[i].score, scorePositionx, (i + 3) * scorePositiony);
     }
   }
 

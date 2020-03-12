@@ -1,0 +1,66 @@
+var p4 = {
+  x : 0,
+  y : 0
+}
+
+// Select opposite adjacent corner
+switch (route) {
+  // left collision use (x,y) or (x,y+h) dest use (x+w,y) or (x+w,y+h)
+  case 1:
+    if (dists[0] < dists[2]) {
+      p4.x = obstacles[block][0] + obstacles[block][2];
+      p4.y = obstacles[block][1];
+    }else {
+      p4.x = obstacles[block][0] + obstacles[block][2];
+      p4.y = obstacles[block][1] + obstacles[block][3];
+    }
+    break;
+
+  // right collision use (x+w,y) or (x+w,y+h) dest use (x,y) or (x,y+h)
+  case 2:
+    if (dists[1] < dists[3]) {
+      p4.x = obstacles[block][0];
+      p4.y = obstacles[block][1];
+    }else {
+      p4.x = obstacles[block][0];
+      p4.y = obstacles[block][1] + obstacles[block][3];
+    }
+    break;
+
+  // top collision use (x,y) or (x+w,y) dest use (x,y+h) or (x+w,y+h)
+  case 3:
+    if (dists[0] < dists[1]) {
+      p4.x = obstacles[block][0];
+      p4.y = obstacles[block][1] + obstacles[block][3];
+    }else {
+      p4.x = obstacles[block][0] + obstacles[block][2];
+      p4.y = obstacles[block][1] + obstacles[block][3];
+    }
+    break;
+
+  // Bottom collision use (x,y+h) or (x+w,y+h) dest use (x,y) or (x+w,y)
+  default:
+    if (dists[2] < dists[3]) {
+      p4.x = obstacles[block][0];
+      p4.y = obstacles[block][1];
+    }else {
+      p4.x = obstacles[block][0] + obstacles[block][2];
+      p4.y = obstacles[block][1];
+    }
+}
+
+// Now using p3 p4 make line equations to get new targetx
+var m1 = 0
+if (p1.x != p3.x) {
+    m1 = (p1.y - p3.y)/(p1.x - p3.x);
+}
+var c1 = p3.y - m1 * p3.x2;
+
+var m2 = 0;
+if (p2.x != p4.x) {
+    m2 = (p2.y - p4.y)/(p2.x - p4.x);
+}
+var c2 = p4.y - m2 * p4.x2;
+
+targetx = (m1 - m2) + c1 - c2;
+targety = m1*(targetx - p3.x) + p3.y;
