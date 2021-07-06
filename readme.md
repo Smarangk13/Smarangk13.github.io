@@ -1,1 +1,3 @@
-Website where I will add my stuff
+Todo-
+
+Rework webpage, small description of projects
